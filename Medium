@@ -1,0 +1,61 @@
+class Card {
+    private String symbol;  // hearts, diamonds, clubs, spades
+    private String value;   // A, 2-10, J, Q, K
+    
+    public Card(String symbol, String value) {
+        this.symbol = symbol;
+        this.value = value;
+    }
+    
+    @Override
+    public String toString() {
+        return value + " of " + symbol;
+    }
+}
+
+class CardCollection {
+    public static void main(String[] args) {
+        java.util.List<Card> deck = new java.util.ArrayList<>();
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        
+        // Initialize full deck
+        String[] symbols = {"Hearts", "Diamonds", "Clubs", "Spades"};
+        String[] values = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
+        
+        for (String symbol : symbols) {
+            for (String value : values) {
+                deck.add(new Card(symbol, value));
+            }
+        }
+        
+        while (true) {
+            System.out.println("\n1. Show all cards  2. Find by symbol  3. Exit");
+            System.out.print("Choose option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice) {
+                case 1: // Show all
+                    for (Card card : deck) {
+                        System.out.println(card);
+                    }
+                    break;
+                    
+                case 2: // Find by symbol
+                    System.out.print("Enter symbol (Hearts/Diamonds/Clubs/Spades): ");
+                    String searchSymbol = scanner.nextLine();
+                    System.out.println("Cards with " + searchSymbol + ":");
+                    for (Card card : deck) {
+                        if (card.toString().contains(searchSymbol)) {
+                            System.out.println(card);
+                        }
+                    }
+                    break;
+                    
+                case 3: // Exit
+                    scanner.close();
+                    return;
+            }
+        }
+    }
+}
