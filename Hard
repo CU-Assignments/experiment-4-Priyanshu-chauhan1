@@ -1,0 +1,72 @@
+class TicketSystem {
+    private int availableSeats = 10;
+    private final Object lock = new Object();
+    
+    public synchronized void bookTicket(String customerName, int seats, boolean isVIP) {
+        try {
+            Thread.currentThread().setPriority(isVIP ? Thread.MAX_PRIORITY : Thread.NORM_PRIORITY);
+            Thread.sleep(100); // Simulate processing time
+            
+            synchronized (lock) {
+                if (seats <= availableSeats) {
+                    availableSeats -= seats;
+                    System.out.println(customerName + " booked " + seats + 
+                                     " seats. Priority: " + Thread.currentThread().getPriority() + 
+                                     " Remaining: " + availableSeats);
+                } else {
+                    System.out.println("Booking failed for " + customerName + 
+                                     ": Insufficient seats");
+                }
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Booking interrupted for " + customerName);
+        }
+    }
+}
+
+class BookingThread extends Thread {
+    private TicketSystem system;
+    private String customerName;
+    private int seats;
+    private boolean isVIP;
+    
+    public BookingThread(TicketSystem system, String customerName, int seats, boolean isVIP) {
+        this.system = system;
+        this.customerName = customerName;
+        this.seats = seats;
+        this.isVIP = isVIP;
+    }
+    
+    @Override
+    public void run() {
+        system.bookTicket(customerName, seats, isVIP);
+    }
+}
+
+class TicketBookingDemo {
+    public static void main(String[] args) {
+        TicketSystem ticketSystem = new TicketSystem();
+        
+        // Create booking threads
+        BookingThread customer1 = new BookingThread(ticketSystem, "John (VIP)", 3, true);
+        BookingThread customer2 = new BookingThread(ticketSystem, "Alice", 4, false);
+        BookingThread customer3 = new BookingThread(ticketSystem, "Bob (VIP)", 2, true);
+        BookingThread customer4 = new BookingThread(ticketSystem, "Emma", 5, false);
+        
+        // Start all bookings
+        customer1.start();
+        customer2.start();
+        customer3.start();
+        customer4.start();
+        
+        // Wait for all threads to complete
+        try {
+            customer1.join();
+            customer2.join();
+            customer3.join();
+            customer4.join();
+        } catch (InterruptedException e) {
+            System.out.println("Main thread interrupted");
+        }
+    }
+}
